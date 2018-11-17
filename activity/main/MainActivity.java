@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import in.kestone.sap.FragmentHelp;
 import in.kestone.sap.R;
 import in.kestone.sap.activity.login.LoginActivity;
 import in.kestone.sap.adapter.ScanAdapter;
@@ -62,9 +63,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     DBHelpher dbh;
     ScanAdapter adapter;
     Toolbar toolbar;
-    TextView toolbarTitle, tvCount;
+    TextView toolbarTitle, exhibitorName, tvCount;
     boolean doubleBackToExitPressedOnce = false;
-    LinearLayout layoutUpload, layoutScan, layoutEnterCode, LayoutLogout;
+    LinearLayout layoutUpload, layoutScan, layoutEnterCode, LayoutLogout, layoutHelp;
     List<String> codeList = new ArrayList<>();
     String[] mStringArray;
 
@@ -92,8 +93,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar( toolbar );
 //        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
         toolbarTitle = toolbar.findViewById( R.id.tvTitle );
+        exhibitorName = toolbar.findViewById( R.id.tvExhibitorName );
         tvCount = toolbar.findViewById( R.id.tvCount );
-        toolbarTitle.setText( R.string.app_name );
+//        toolbarTitle.setText( R.string.app_name );
+        exhibitorName.setText( new DataManager( getApplicationContext() ).getName() );
 
 
         //fetch data from local database
@@ -114,10 +117,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layoutScan = findViewById( R.id.layout_scan );
         layoutEnterCode = findViewById( R.id.layout_enter_code );
         LayoutLogout = findViewById( R.id.layout_log_out );
+        layoutHelp = findViewById( R.id.layout_help );
         layoutUpload.setOnClickListener( this );
         layoutScan.setOnClickListener( this );
         layoutEnterCode.setOnClickListener( this );
         LayoutLogout.setOnClickListener( this );
+        layoutHelp.setOnClickListener( this );
     }
 
     @Override
@@ -148,6 +153,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateText(String scanCode) {
+
+        findViewById( R.id.container ).setVisibility( View.GONE );
+        recyclerView.setVisibility( View.VISIBLE );
+
         Log.e( "CODE ", scanCode );
         DateFormat df = new SimpleDateFormat( "dd-MM-yyyy HH:mm:ss" );
         String date = df.format( Calendar.getInstance().getTime() );
@@ -189,7 +198,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             super.onBackPressed();
             return;
         }
-
+        findViewById( R.id.container ).setVisibility( View.GONE );
+        recyclerView.setVisibility( View.VISIBLE );
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText( this, "Please click BACK again to exit", Toast.LENGTH_SHORT ).show();
 
@@ -244,6 +254,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.layout_scan:
                 startQRScanner();
+                break;
+            case R.id.layout_help:
+                recyclerView.setVisibility( View.GONE );
+                findViewById( R.id.container ).setVisibility( View.VISIBLE );
+                getSupportFragmentManager().beginTransaction().replace( R.id.container, new FragmentHelp() ).commit();
                 break;
             case R.id.layout_log_out:
                 logout();
@@ -383,5 +398,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
 
 }
